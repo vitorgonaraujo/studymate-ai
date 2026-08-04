@@ -11,10 +11,12 @@ class Settings:
     """
 
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
+    # GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "http://127.0.0.1:1234/v1")
 
     LLM_MODEL: str = os.getenv("LLM_MODEL", "")
+    # LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-2.5-flash")
 
     CHROMA_PATH: str = os.getenv("CHROMA_PATH", "storage/chroma")
 

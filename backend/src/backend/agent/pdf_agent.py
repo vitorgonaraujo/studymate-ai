@@ -1,6 +1,7 @@
 from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
+# from langchain_groq import ChatGroq
 from backend.core.config import settings
 from backend.tools.search_documents import search_documents
 
@@ -16,6 +17,17 @@ def get_llm() -> ChatOpenAI:
         api_key=settings.LLM_API_KEY,
         temperature=0.2,
     )
+
+
+# def get_llm():
+#     """
+#     Cria a instância da LLM.
+#     """
+#     return ChatGroq(
+#         model="llama-3.3-70b-versatile",
+#         groq_api_key=settings.GROQ_API_KEY,
+#         temperature=0.2,
+#     )
 
 
 def create_pdf_agent():

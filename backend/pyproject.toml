@@ -22,6 +22,7 @@ uvicorn = "^0.52.1"
 aiofiles = "^25.1.0"
 python-multipart = "^0.0.32"
 pymupdf = "^1.28.0"
+langchain-groq = "^1.1.3"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
