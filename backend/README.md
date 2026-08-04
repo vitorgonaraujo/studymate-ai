@@ -112,7 +112,7 @@ Exemplo:
 
 ```env
 
-GOOGLE_API_KEY: your_api_key
+GROQ_API_KEY: your_api_key
 
 CHROMA_PATH=storage/chroma
 UPLOAD_PATH=storage/uploads
