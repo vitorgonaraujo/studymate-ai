@@ -4,6 +4,7 @@ from backend.tools.search_documents import (
     get_retrieved_documents,
 )
 
+
 def chat(
     message: str,
     document_ids: list[str],
