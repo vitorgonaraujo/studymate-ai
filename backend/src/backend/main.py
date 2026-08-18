@@ -3,10 +3,11 @@ import logging
 from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Annotated
 from uuid import uuid4
 
 import aiofiles
-from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
+from fastapi import FastAPI, File, Header, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
@@ -198,10 +199,33 @@ def delete_documents_endpoint(request: Request, response: Response, body: Docume
 
 
 @app.post("/chat", response_model=ChatResponse)
-def chat_endpoint(request: Request, response: Response, body: ChatRequest):
+def chat_endpoint(
+    request: Request,
+    response: Response,
+    body: ChatRequest,
+    llm_provider: Annotated[str, Header(alias="X-LLM-Provider")] = "local",
+    llm_api_key: Annotated[str | None, Header(alias="X-LLM-API-Key")] = None,
+    llm_model: Annotated[str | None, Header(alias="X-LLM-Model")] = None,
+):
     session_id = get_browser_session(request, response)
     owned = get_owned_documents(session_id, body.document_ids)
     if len(owned) != len(body.document_ids):
         raise HTTPException(404, "Um ou mais documentos não pertencem a esta sessão.")
     touch_documents(session_id, body.document_ids)
-    return ChatResponse(**chat(body.message.strip(), body.document_ids))
+    try:
+        result = chat(
+            body.message,
+            body.document_ids,
+            llm_provider,
+            llm_api_key,
+            llm_model,
+        )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Falha ao consultar o provedor de LLM")
+        raise HTTPException(
+            502,
+            "Não foi possível consultar o provedor. Verifique a chave e o modelo.",
+        ) from exc
+    return ChatResponse(**result)

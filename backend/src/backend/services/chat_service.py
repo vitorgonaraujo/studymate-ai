@@ -4,19 +4,17 @@ from backend.tools.search_documents import (
     get_retrieved_documents,
 )
 
-_agent = None
 
-
-def get_agent():
-    global _agent
-    if _agent is None:
-        _agent = create_pdf_agent()
-    return _agent
-
-
-def chat(message: str, document_ids: list[str]) -> dict:
+def chat(
+    message: str,
+    document_ids: list[str],
+    provider: str,
+    api_key: str | None,
+    model: str | None,
+) -> dict:
     with document_search_scope(document_ids):
-        response = get_agent().invoke(
+        agent = create_pdf_agent(provider, api_key, model)
+        response = agent.invoke(
             {
                 "messages": [
                     (

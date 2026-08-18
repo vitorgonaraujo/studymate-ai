@@ -10,6 +10,8 @@ class Settings:
     LLM_API_KEY = os.getenv("LLM_API_KEY", "")
     LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://127.0.0.1:1234/v1")
     LLM_MODEL = os.getenv("LLM_MODEL", "")
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     CHROMA_PATH = os.getenv("CHROMA_PATH", "storage/chroma")
     UPLOAD_PATH = os.getenv("UPLOAD_PATH", "storage/uploads")
     SESSION_COOKIE_NAME = os.getenv("SESSION_COOKIE_NAME", "studymate_session")

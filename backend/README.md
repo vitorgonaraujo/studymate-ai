@@ -36,6 +36,20 @@ LLM_MODEL=nome-do-modelo
 
 O `HF_TOKEN` é opcional para o download do modelo de embeddings.
 
+## Provedores de LLM
+
+O chat aceita `local`, `groq` e `gemini`. Para Groq ou Gemini, o frontend envia a chave somente na requisição `POST /chat`:
+
+```http
+X-LLM-Provider: groq
+X-LLM-API-Key: chave-do-usuario
+X-LLM-Model: llama-3.1-8b-instant
+```
+
+`X-LLM-Model` é opcional. O backend usa `GROQ_MODEL` ou `GEMINI_MODEL` quando ele não é enviado. Para o modo local, use `X-LLM-Provider: local`; as configurações `LLM_BASE_URL`, `LLM_API_KEY` e `LLM_MODEL` virão do `.env`.
+
+A chave recebida não é persistida no cookie, no cadastro de documentos nem no banco vetorial. O frontend também não deve colocá-la em URL, logs ou armazenamento permanente; mantenha-a apenas em memória enquanto a página estiver aberta.
+
 ## Endpoints
 
 - `GET /`: health check;
