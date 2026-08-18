@@ -3,9 +3,7 @@ name = "backend"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-packages = [
-    { include = "backend", from = "src" }
-]
+packages = [{ include = "backend", from = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.12,<4.0.0"
