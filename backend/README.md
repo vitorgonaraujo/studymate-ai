@@ -1,263 +1,56 @@
-# StudyMate AI - Backend
+# StudyMate AI — Backend
 
-Backend responsável pelo processamento de documentos PDF e execução do agente RAG.
+API de estudo com FastAPI, LangChain e ChromaDB para perguntas e respostas baseadas em PDFs.
 
-## Tecnologias
+## Comportamento
 
-- Python
-- FastAPI
-- LangChain
-- ChromaDB
-- Poetry
-- pyenv
+- cada navegador recebe uma sessão anônima por cookie, sem cadastro ou login;
+- cada sessão pode manter no máximo 3 PDFs;
+- um PDF expira após 72 horas sem ser usado no chat;
+- a limpeza automática remove o arquivo, o cadastro e seus embeddings;
+- sessões diferentes não conseguem listar, consultar ou excluir os documentos umas das outras;
+- uploads são limitados a 20 MB e validados antes do processamento.
 
-## Funcionalidades
+A sessão é vinculada ao cookie do navegador. Ao limpar os cookies, o navegador perde acesso aos documentos antigos; eles serão apagados automaticamente ao vencerem.
 
-- Upload de arquivos PDF
-- Extração de conteúdo dos documentos
-- Divisão dos documentos em chunks
-- Geração de embeddings
-- Armazenamento em banco vetorial
-- Busca semântica
-- Perguntas e respostas utilizando RAG
-- Suporte para múltiplos documentos
-- Exclusão de documentos
+## Executar
 
-## Estrutura
-
-```
-backend/
-
-├── src/
-│   └── backend/
-│       ├── agent/
-│       ├── core/
-│       ├── rag/
-│       ├── services/
-│       ├── tools/
-│       └── main.py
-│
-├── storage/
-│
-├── pyproject.toml
-├── poetry.lock
-└── README.md
-```
-
-## Requisitos
-
-- Python instalado
-- pyenv instalado
-- Poetry instalado
-
-## Configuração do ambiente
-
-### Instalar a versão do Python
-
-Verificar versões disponíveis:
+Requer Python 3.12 e Poetry.
 
 ```bash
-pyenv versions
-```
-
-Instalar uma versão:
-
-```bash
-pyenv install 3.12.13
-```
-
-Definir a versão do projeto:
-
-```bash
-pyenv local 3.12.13
-```
-
-Verificar:
-
-```bash
-python --version
-```
-
----
-
-## Instalação das dependências
-
-Instalar as dependências utilizando Poetry:
-
-```bash
+cd backend
+cp .env.example .env
 poetry install
-```
-
-O Poetry irá criar e gerenciar o ambiente virtual automaticamente.
-
-Entrar no ambiente:
-
-```bash
-poetry shell
-```
-
-ou executar comandos diretamente:
-
-```bash
-poetry run <comando>
-```
-
----
-
-## Configuração
-
-Criar um arquivo `.env` na raiz do backend.
-
-Exemplo:
-
-```env
-
-GROQ_API_KEY: your_api_key
-
-CHROMA_PATH=storage/chroma
-UPLOAD_PATH=storage/uploads
-
-HF_TOKEN=your-api-key
-```
-
----
-
-## Executando
-
-Com o ambiente Poetry ativo:
-
-```bash
-uvicorn backend.main:app --reload
-```
-
-ou:
-
-```bash
 poetry run uvicorn backend.main:app --reload
 ```
 
-A API estará disponível em:
+A API ficará disponível em `http://localhost:8000` e o Swagger em `http://localhost:8000/docs`.
 
-```
-http://localhost:8000
-```
+Configure no `.env` o provedor compatível com a API da OpenAI:
 
-Documentação Swagger:
-
-```
-http://localhost:8000/docs
+```env
+LLM_API_KEY=sua-chave
+LLM_BASE_URL=https://endereco-do-provedor/v1
+LLM_MODEL=nome-do-modelo
 ```
 
----
+O `HF_TOKEN` é opcional para o download do modelo de embeddings.
 
 ## Endpoints
 
-### Health Check
+- `GET /`: health check;
+- `POST /upload`: envia um PDF para a sessão;
+- `GET /documents`: lista os documentos da sessão;
+- `POST /chat`: faz uma pergunta usando até 3 documentos da sessão;
+- `DELETE /documents`: remove documentos da sessão.
 
-```
-GET /
-```
+Nas chamadas feitas pelo frontend, habilite o envio de credenciais para que o cookie seja enviado (`withCredentials: true` no Angular ou `credentials: "include"` no Fetch).
 
-Verifica se a API está funcionando.
+## Testes
 
----
-
-### Upload de documento
-
-```
-POST /upload
-```
-
-Recebe um arquivo PDF e realiza:
-
-- Salvamento do arquivo
-- Extração do conteúdo
-- Criação dos chunks
-- Geração dos embeddings
-- Armazenamento no banco vetorial
-- Cadastro do documento
-
----
-
-### Listar documentos
-
-```
-GET /documents
+```bash
+poetry run ruff check src tests
+poetry run pytest
 ```
 
-Retorna todos os documentos cadastrados.
-
-Exemplo:
-
-```json
-[
-  {
-    "document_id": "uuid",
-    "filename": "documento.pdf",
-    "pages": 10,
-    "chunks": 30
-  }
-]
-```
-
----
-
-### Perguntar aos documentos
-
-```
-POST /chat
-```
-
-Realiza perguntas utilizando os documentos selecionados.
-
-Exemplo:
-
-```json
-{
-  "message": "Qual o assunto principal do documento?",
-  "document_ids": [
-    "document-id"
-  ]
-}
-```
-
-Fluxo:
-
-1. Recebe a pergunta
-2. Busca contexto relevante no banco vetorial
-3. Recupera os trechos relacionados
-4. Envia o contexto para a LLM
-5. Retorna a resposta baseada nos documentos
-
----
-
-### Excluir documentos
-
-```
-DELETE /documents
-```
-
-Remove um ou mais documentos.
-
-Exemplo:
-
-```json
-{
-  "document_ids": [
-    "document-id-1",
-    "document-id-2"
-  ]
-}
-```
-
-A exclusão remove:
-
-- Cadastro do documento
-- Embeddings do ChromaDB
-- Arquivo PDF armazenado
-
----
-
-## Status
-
-🚧 Em desenvolvimento
+O armazenamento de metadados continua em JSON de propósito, para manter o projeto pequeno e didático. Para múltiplas instâncias da API, o próximo passo seria migrá-lo para PostgreSQL ou outro banco compartilhado.
