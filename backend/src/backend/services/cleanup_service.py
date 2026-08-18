@@ -2,7 +2,10 @@ import logging
 from pathlib import Path
 
 from backend.rag.vector_store import delete_documents as delete_vector_documents
-from backend.services.document_service import delete_documents_by_id, get_expired_documents
+from backend.services.document_service import (
+    delete_documents_by_id,
+    get_expired_documents,
+)
 
 logger = logging.getLogger(__name__)
 

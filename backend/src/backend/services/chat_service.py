@@ -1,5 +1,8 @@
 from backend.agent.pdf_agent import create_pdf_agent
-from backend.tools.search_documents import document_search_scope, get_retrieved_documents
+from backend.tools.search_documents import (
+    document_search_scope,
+    get_retrieved_documents,
+)
 
 _agent = None
 
@@ -18,8 +21,10 @@ def chat(message: str, document_ids: list[str]) -> dict:
                 "messages": [
                     (
                         "user",
-                        "Documentos selecionados: "
-                        f"{', '.join(document_ids)}\n\nPergunta: {message}",
+                        (
+                            "Documentos selecionados: "
+                            f"{', '.join(document_ids)}\n\nPergunta: {message}"
+                        ),
                     )
                 ]
             }

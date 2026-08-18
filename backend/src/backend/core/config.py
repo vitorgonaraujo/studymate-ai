@@ -1,4 +1,5 @@
 import os
+from typing import ClassVar
 
 from dotenv import load_dotenv
 
@@ -18,7 +19,7 @@ class Settings:
     MAX_DOCUMENTS_PER_SESSION = int(os.getenv("MAX_DOCUMENTS_PER_SESSION", "3"))
     MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "20"))
     CLEANUP_INTERVAL_MINUTES = int(os.getenv("CLEANUP_INTERVAL_MINUTES", "60"))
-    FRONTEND_ORIGINS = [
+    FRONTEND_ORIGINS: ClassVar[list[str]] = [
         value.strip()
         for value in os.getenv(
             "FRONTEND_ORIGINS", "http://localhost:4200,http://localhost:5173"

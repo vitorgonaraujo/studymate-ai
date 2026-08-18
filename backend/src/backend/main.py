@@ -113,7 +113,11 @@ def health_check():
 
 
 @app.post("/upload", status_code=201)
-async def upload_pdf(request: Request, response: Response, file: UploadFile = File(...)):
+async def upload_pdf(
+    request: Request,
+    response: Response,
+    file: UploadFile = File(...),  # noqa: B008
+):
     session_id = get_browser_session(request, response)
     filename = Path(file.filename or "").name
     if not filename or Path(filename).suffix.lower() != ".pdf":

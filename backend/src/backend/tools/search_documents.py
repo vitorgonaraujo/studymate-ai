@@ -6,13 +6,15 @@ from langchain_core.tools import tool
 from backend.rag.vector_store import search_documents as vector_search
 
 _ALLOWED_DOCUMENT_IDS: ContextVar[tuple[str, ...]] = ContextVar("allowed_ids", default=())
-_RETRIEVED_DOCUMENTS: ContextVar[list] = ContextVar("retrieved_documents", default=[])
+_RETRIEVED_DOCUMENTS: ContextVar[tuple] = ContextVar(
+    "retrieved_documents", default=()
+)
 
 
 @contextmanager
 def document_search_scope(document_ids: list[str]):
     allowed_token = _ALLOWED_DOCUMENT_IDS.set(tuple(document_ids))
-    retrieved_token = _RETRIEVED_DOCUMENTS.set([])
+    retrieved_token = _RETRIEVED_DOCUMENTS.set(())
     try:
         yield
     finally:
@@ -21,7 +23,7 @@ def document_search_scope(document_ids: list[str]):
 
 
 def get_retrieved_documents() -> list:
-    return _RETRIEVED_DOCUMENTS.get()
+    return list(_RETRIEVED_DOCUMENTS.get())
 
 
 def format_documents(documents) -> str:
@@ -41,7 +43,7 @@ def search_documents(query: str, document_ids: list[str]) -> str:
         return "Nenhum documento foi autorizado para esta pergunta."
     # Os IDs fornecidos pela LLM nunca ampliam o escopo autorizado pelo servidor.
     documents = vector_search(query=query, document_ids=allowed, k=8)
-    _RETRIEVED_DOCUMENTS.set(documents)
+    _RETRIEVED_DOCUMENTS.set(tuple(documents))
     if not documents:
         return "Nenhuma informação encontrada nos documentos selecionados."
     return format_documents(documents)
